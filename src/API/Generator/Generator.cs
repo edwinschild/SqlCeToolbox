@@ -1804,6 +1804,7 @@ namespace ErikEJ.SqlCeScripting
             }
             string colNull = col.IsNullable == YesNoOption.YES ? " NULL" : " NOT NULL";
             string collate = string.Empty;
+            string colCheck = string.Empty;
             switch (col.DataType)
             {
                 case "nvarchar":
@@ -1813,14 +1814,16 @@ namespace ErikEJ.SqlCeScripting
                     if (_sqlite)
                     {
                         collate = col.IsCaseSensitivite ? string.Empty : " COLLATE NOCASE";
+                        colCheck = col.CharacterMaxLength <= 0 ? string.Empty : $" CHECK(LENGTH({col.ColumnName}) <= {col.CharacterMaxLength})";
                     }
 
                     line = string.Format(CultureInfo.InvariantCulture,
-                        "[{0}] {1}({2}){3}{4}{5}"
+                        "[{0}] {1}({2}){3}{4}{5}{6}"
                         , col.ColumnName
                         , col.DataType
                         , col.CharacterMaxLength == -1 ? 4000 : col.CharacterMaxLength
                         , colDefault
+                        , colCheck
                         , colNull
                         , collate
                         );
